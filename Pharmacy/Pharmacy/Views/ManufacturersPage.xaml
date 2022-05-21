@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Pharmacy.Views.ManufacturersPage"
+             Title="{Binding Title}"
+             xmlns:local="clr-namespace:Pharmacy.ViewModels"  
+             xmlns:model="clr-namespace:Pharmacy.Models"  >
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add" Command="{Binding AddManufacturerCommand}" />
+    </ContentPage.ToolbarItems>
+    <StackLayout>
+        <SearchBar Placeholder="Search..." TextChanged="SearchBar_TextChanged"></SearchBar>
+        <RefreshView x:DataType="local:ManufacturersViewModel" Command="{Binding LoadManufacturersCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+            <CollectionView x:Name="MedicinesListView"
+                    ItemsSource="{Binding Manufacturers}"
+                    SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout Padding="10" x:DataType="model:Manufacturer">
+                            <Label Text="{Binding Title}" 
+                                LineBreakMode="NoWrap" 
+                                Style="{DynamicResource ListManufacturerTextStyle}" 
+                                FontSize="16" />
+                            <Label Text="{Binding Phone}" 
+                                LineBreakMode="NoWrap"
+                                Style="{DynamicResource ListManufacturerDetailTextStyle}"
+                                FontSize="13" />
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                    NumberOfTapsRequired="1"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type local:ManufacturersViewModel}}, Path=ManufacturerTapped}"		
+                                    CommandParameter="{Binding .}">
+                                </TapGestureRecognizer>
+                            </StackLayout.GestureRecognizers>
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </StackLayout>
+</ContentPage>
