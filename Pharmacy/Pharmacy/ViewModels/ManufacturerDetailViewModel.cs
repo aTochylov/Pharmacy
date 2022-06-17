@@ -69,8 +69,9 @@ namespace Pharmacy.ViewModels
             return !String.IsNullOrWhiteSpace(title)
                 && !String.IsNullOrWhiteSpace(phone)
                 && !String.IsNullOrWhiteSpace(email)
-                && !items.Any(m => m.Phone == phone)
-                && !items.Any(m => m.Email == email);
+                && !items.Any(m => (m.Id != manufacturerId) && (m.Title == Title))
+                && !items.Any(m => (m.Id != manufacturerId) && (m.Phone == Phone))
+                && !items.Any(m => (m.Id != manufacturerId) && m.Email == email);
         }
 
         private async void OnCancel() => await Shell.Current.GoToAsync("..");

@@ -16,10 +16,5 @@ namespace Pharmacy
             Routing.RegisterRoute(nameof(ManufacturerDetailPage), typeof(ManufacturerDetailPage));
             Routing.RegisterRoute(nameof(NewManufacturerPage), typeof(NewManufacturerPage));
         }
-
-        //private async void OnMenuItemClicked(object sender, EventArgs e)
-        //{
-        //    await Shell.Current.GoToAsync("..");
-        //}
     }
 }

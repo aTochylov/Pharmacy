@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\MockDataStore.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="GettingStarted.txt" />
   </ItemGroup>
 
