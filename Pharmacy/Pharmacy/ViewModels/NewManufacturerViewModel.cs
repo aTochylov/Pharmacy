@@ -1,4 +1,5 @@
-﻿using Pharmacy.Models;
+﻿using Pharmacy.Data;
+using Pharmacy.Models;
 using System;
 using System.Linq;
 using Xamarin.Forms;
@@ -7,6 +8,8 @@ namespace Pharmacy.ViewModels
 {
     public class NewManufacturerViewModel : BaseViewModel
     {
+        private readonly UnitOfWork Data;
+
         private string title;
         private string address;
         private string phone;
@@ -14,6 +17,7 @@ namespace Pharmacy.ViewModels
 
         public NewManufacturerViewModel()
         {
+            Data = UnitOfWork.GetUnitOfWork();
             SaveCommand = new Command(OnSave, ValidateSave);
             CancelCommand = new Command(OnCancel);
             this.PropertyChanged +=
@@ -22,7 +26,7 @@ namespace Pharmacy.ViewModels
 
         private bool ValidateSave()
         {
-            var items = App.ManufacturerRepo.GetItems();
+            var items = Data.ManufacturerRepository.GetAll().Result;
             return !String.IsNullOrWhiteSpace(title)
                 && !String.IsNullOrWhiteSpace(phone)
                 && !String.IsNullOrWhiteSpace(email)
@@ -67,7 +71,8 @@ namespace Pharmacy.ViewModels
                 Address = Address,
                 Email = Email
             };
-            App.ManufacturerRepo.Add(newManufacturer);
+            await Data.ManufacturerRepository.Insert(newManufacturer);
+            await Data.Save();
             await Shell.Current.GoToAsync("..");
         }
     }

@@ -1,14 +1,17 @@
-﻿using Pharmacy.Models;
+﻿using Pharmacy.Data;
+using Pharmacy.Models;
 using Pharmacy.Views;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using Xamarin.Forms;
 
 namespace Pharmacy.ViewModels
 {
     public class ManufacturersViewModel : BaseViewModel
     {
+        private readonly UnitOfWork Data;
         private Manufacturer _selectedManufacturer;
 
         public ObservableCollection<Manufacturer> Manufacturers { get; }
@@ -20,6 +23,7 @@ namespace Pharmacy.ViewModels
 
         public ManufacturersViewModel()
         {
+            Data = UnitOfWork.GetUnitOfWork();
             Title = "Browse Manufacturer";
             Manufacturers = new ObservableCollection<Manufacturer>();
             LoadManufacturersCommand = new Command(() => ExecuteLoadManufacturersCommand());
@@ -29,14 +33,14 @@ namespace Pharmacy.ViewModels
             AddManufacturerCommand = new Command(OnAddManufacturer);
         }
 
-        void ExecuteLoadManufacturersCommand()
+        async void ExecuteLoadManufacturersCommand()
         {
             IsBusy = true;
 
             try
             {
                 Manufacturers.Clear();
-                var manufacturers = App.ManufacturerRepo.GetItems();
+                var manufacturers = await Data.ManufacturerRepository.GetAll();
                 foreach (var Manufacturer in manufacturers)
                 {
                     Manufacturers.Add(Manufacturer);
@@ -74,13 +78,17 @@ namespace Pharmacy.ViewModels
         {
             if (Manufacturer == null)
                 return;
-            await Shell.Current.GoToAsync($"{nameof(ManufacturerDetailPage)}?{nameof(ManufacturerDetailViewModel.ManufacturerId)}={Manufacturer.Id}");
+            await Shell.Current.GoToAsync($"{nameof(ManufacturerDetailPage)}?{nameof(ManufacturerDetailViewModel.ManufacturerId)}={Manufacturer.ManufacturerId}");
         }
 
         public void OnSearchTextChanged(string query)
         {
             Manufacturers.Clear();
-            var results = App.ManufacturerRepo.GetSearchResults(query);
+            var results = Data.ManufacturerRepository.GetAll().Result
+                .Where(i => i.Title.ToLower().Contains(query.ToLower()) 
+                || i.Phone.ToLower().Contains(query.ToLower()) 
+                || i.Address.ToLower().Contains(query.ToLower()) 
+                || i.Email.ToLower().Contains(query.ToLower()));
             foreach (var r in results)
                 Manufacturers.Add(r);
         }

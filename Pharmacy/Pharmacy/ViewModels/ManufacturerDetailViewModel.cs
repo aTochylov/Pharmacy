@@ -1,4 +1,5 @@
-﻿using Pharmacy.Models;
+﻿using Pharmacy.Data;
+using Pharmacy.Models;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace Pharmacy.ViewModels
     [QueryProperty(nameof(ManufacturerId), nameof(ManufacturerId))]
     public class ManufacturerDetailViewModel : BaseViewModel
     {
+        private readonly UnitOfWork Data;
+
         private int manufacturerId;
         private string title;
         private string address;
@@ -56,6 +59,7 @@ namespace Pharmacy.ViewModels
 
         public ManufacturerDetailViewModel()
         {
+            Data = UnitOfWork.GetUnitOfWork();
             SaveCommand = new Command(OnSave, ValidateSave);
             CancelCommand = new Command(OnCancel);
             this.PropertyChanged +=
@@ -65,13 +69,13 @@ namespace Pharmacy.ViewModels
 
         private bool ValidateSave()
         {
-            var items = App.ManufacturerRepo.GetItems();
+            var items = Data.ManufacturerRepository.GetAll().Result;
             return !String.IsNullOrWhiteSpace(title)
                 && !String.IsNullOrWhiteSpace(phone)
                 && !String.IsNullOrWhiteSpace(email)
-                && !items.Any(m => (m.Id != manufacturerId) && (m.Title == Title))
-                && !items.Any(m => (m.Id != manufacturerId) && (m.Phone == Phone))
-                && !items.Any(m => (m.Id != manufacturerId) && m.Email == email);
+                && !items.Any(m => (m.ManufacturerId != manufacturerId) && (m.Title == Title))
+                && !items.Any(m => (m.ManufacturerId != manufacturerId) && (m.Phone == Phone))
+                && !items.Any(m => (m.ManufacturerId != manufacturerId) && m.Email == email);
         }
 
         private async void OnCancel() => await Shell.Current.GoToAsync("..");
@@ -80,27 +84,28 @@ namespace Pharmacy.ViewModels
         {
             Manufacturer newManufacturer = new Manufacturer()
             {
-                Id = ManufacturerId,
+                ManufacturerId = ManufacturerId,
                 Title = Title,
                 Address = Address,
                 Phone = Phone,
                 Email = Email
             };
-            App.ManufacturerRepo.Update(newManufacturer);
+            await Data.ManufacturerRepository.Update(newManufacturer);
+            await Data.Save();
             await Shell.Current.GoToAsync("..");
         }
 
         private async void OnDelete()
         {
-            App.ManufacturerRepo.Delete(App.ManufacturerRepo.Get(ManufacturerId));
+            await Data.ManufacturerRepository.Delete(ManufacturerId);
             await Shell.Current.GoToAsync("..");
         }
 
-        public void LoadManufacturerId(int ManufacturerId)
+        public async void LoadManufacturerId(int ManufacturerId)
         {
             try
             {
-                var Manufacturer = App.ManufacturerRepo.Get(ManufacturerId);
+                var Manufacturer = await Data.ManufacturerRepository.GetById(ManufacturerId);
                 Title = Manufacturer.Title;
                 Address = Manufacturer.Address;
                 Phone = Manufacturer.Phone;

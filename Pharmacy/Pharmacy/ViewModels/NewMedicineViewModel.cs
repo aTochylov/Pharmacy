@@ -1,4 +1,5 @@
-﻿using Pharmacy.Models;
+﻿using Pharmacy.Data;
+using Pharmacy.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,6 +9,8 @@ namespace Pharmacy.ViewModels
 {
     public class NewMedicineViewModel : BaseViewModel
     {
+        private readonly UnitOfWork Data;
+
         private string title;
         private string barcode;
         private int manufacturerId;
@@ -22,7 +25,8 @@ namespace Pharmacy.ViewModels
 
         public NewMedicineViewModel()
         {
-            Manufacturers = new ObservableCollection<Manufacturer>(App.ManufacturerRepo.GetItems());
+            Data = UnitOfWork.GetUnitOfWork();
+            Manufacturers = new ObservableCollection<Manufacturer>(Data.ManufacturerRepository.GetAll().Result);
             DateOfManufacture = DateTime.Today;
             ExpirationDate = DateTime.Today;
             SaveCommand = new Command(OnSave, ValidateSave);
@@ -36,7 +40,7 @@ namespace Pharmacy.ViewModels
             return !String.IsNullOrWhiteSpace(title)
                 && !String.IsNullOrWhiteSpace(barcode)
                 && selectedManufacturer != null
-                && !App.MedicineRepo.GetItems().Any(m => m.Barcode == Barcode);
+                && !Data.MedicineRepository.GetAll().Result.Any(m => m.Barcode == Barcode);
         }
 
         public string Title
@@ -108,7 +112,7 @@ namespace Pharmacy.ViewModels
             {
                 Title = Title,
                 Barcode = Barcode,
-                ManufacturerId = SelectedManufacturer.Id,
+                ManufacturerId = SelectedManufacturer.ManufacturerId,
                 Packaging = Packaging,
                 Price = Price,
                 OnPrescription = OnPrescription,
@@ -116,7 +120,8 @@ namespace Pharmacy.ViewModels
                 ExpirationDate = ExpirationDate,
                 Quantity = Quantity
             };
-            App.MedicineRepo.Add(newMedicine);
+            await Data.MedicineRepository.Insert(newMedicine);
+            await Data.Save();
             await Shell.Current.GoToAsync("..");
         }
     }

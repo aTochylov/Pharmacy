@@ -1,7 +1,9 @@
-﻿using Pharmacy.Models;
+﻿using Pharmacy.Data;
+using Pharmacy.Models;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Pharmacy.ViewModels
@@ -9,6 +11,8 @@ namespace Pharmacy.ViewModels
     [QueryProperty(nameof(MedicineId), nameof(MedicineId))]
     public class MedicineDetailViewModel : BaseViewModel
     {
+        private readonly UnitOfWork Data;
+
         private int medicineId;
         private string title;
         private string barcode;
@@ -88,7 +92,7 @@ namespace Pharmacy.ViewModels
 
         public MedicineDetailViewModel()
         {
-
+            Data = UnitOfWork.GetUnitOfWork();
             SaveCommand = new Command(OnSave, ValidateSave);
             CancelCommand = new Command(OnCancel);
             this.PropertyChanged +=
@@ -100,7 +104,7 @@ namespace Pharmacy.ViewModels
         {
             return !String.IsNullOrWhiteSpace(title)
                 && !String.IsNullOrWhiteSpace(barcode)
-                && !App.MedicineRepo.GetItems().Any(m => (m.Id != MedicineId) && (m.Barcode == Barcode));
+                && !Data.MedicineRepository.GetAll().Result.Any(m => (m.MedicineId != MedicineId) && (m.Barcode == Barcode));
         }
 
         private async void OnCancel() => await Shell.Current.GoToAsync("..");
@@ -109,36 +113,39 @@ namespace Pharmacy.ViewModels
         {
             Medicine newMedicine = new Medicine()
             {
-                Id = MedicineId,
+                MedicineId = MedicineId,
                 Title = Title,
                 Barcode = Barcode,
-                ManufacturerId = manufacturerId,
                 Packaging = Packaging,
                 Price = Price,
                 OnPrescription = OnPrescription,
                 DateOfManufacture = DateOfManufacture,
                 ExpirationDate = ExpirationDate,
-                Quantity = Quantity
+                Quantity = Quantity,
+                ManufacturerId = manufacturerId
             };
-            App.MedicineRepo.Update(newMedicine);
+            await Data.MedicineRepository.Update(newMedicine);
+            await Data.Save();
             await Shell.Current.GoToAsync("..");
         }
 
         private async void OnDelete()
         {
-            App.MedicineRepo.Delete(App.MedicineRepo.Get(MedicineId));
+            await Data.MedicineRepository.Delete(MedicineId);
             await Shell.Current.GoToAsync("..");
         }
 
-        public async void LoadMedicineId(int MedicineId)
+        public async Task LoadMedicineId(int MedicineId)
         {
             try
             {
-                var Medicine = App.MedicineRepo.Get(MedicineId);
-                var manuf = App.ManufacturerRepo.Get(Medicine.ManufacturerId);
+                var Medicine = await Data.MedicineRepository.GetById(MedicineId);
                 Title = Medicine.Title;
                 Barcode = Medicine.Barcode;
-                Manufacturer = manuf.Title;
+                Manufacturer = Data.ManufacturerRepository.GetAll().Result
+                    .Join(await Data.MedicineRepository.GetAll(), manuf => manuf.ManufacturerId, med => med.ManufacturerId,
+                            (manuf, med) => new { manuf.Title, med.MedicineId })
+                    .FirstOrDefault(a => a.MedicineId == Medicine.MedicineId).Title;
                 manufacturerId = Medicine.ManufacturerId;
                 Packaging = Medicine.Packaging;
                 Price = Medicine.Price;
