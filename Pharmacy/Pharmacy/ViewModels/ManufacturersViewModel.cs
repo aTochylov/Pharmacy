@@ -3,6 +3,7 @@ using Pharmacy.Views;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -80,10 +81,9 @@ namespace Pharmacy.ViewModels
 
         public void OnSearchTextChanged(string query)
         {
-            //Manufacturers.Clear();
-            //var results = App.ManufacturerRepo.GetSearchResults(query);
-            //foreach (var r in results)
-            //    Manufacturers.Add(r);
+            Manufacturers.Clear();
+            foreach (var i in data.ManufacturerRepository.Search(query))
+                Manufacturers.Add(i);
         }
     }
 }

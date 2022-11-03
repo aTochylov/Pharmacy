@@ -1,10 +1,13 @@
-﻿using Pharmacy.Models;
+﻿using Pharmacy.Data;
+using Pharmacy.Models;
 using Pharmacy.Views;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 
 namespace Pharmacy.ViewModels
 {
@@ -55,10 +58,9 @@ namespace Pharmacy.ViewModels
 
         public void OnSearchTextChanged(string query)
         {
-            //Medicines.Clear();
-            //var results = App.MedicineRepo.GetSearchResults(query);
-            //foreach (var r in results)
-            //    Medicines.Add(r);
+            Medicines.Clear();
+            foreach (var i in data.MedicineRepository.Search(query))
+                Medicines.Add(i);
         }
 
         public void OnAppearing()

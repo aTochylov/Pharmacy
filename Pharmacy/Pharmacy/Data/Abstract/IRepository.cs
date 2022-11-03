@@ -10,5 +10,6 @@ namespace Pharmacy.Data.Abstract
         Task<bool> Insert(T obj);
         Task<bool> Update(T obj);
         Task<bool> Delete(int id);
+        //IEnumerable<T> Search(string query);
     }
 }

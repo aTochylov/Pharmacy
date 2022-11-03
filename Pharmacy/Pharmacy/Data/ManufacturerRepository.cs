@@ -4,6 +4,7 @@ using Pharmacy.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Resources;
 using System.Text;
@@ -28,7 +29,7 @@ namespace Pharmacy.Data
 
         public async Task<bool> Delete(int id)
         {
-            HttpResponseMessage response = await client.DeleteAsync(new UriBuilder(manufacturerUrl, id.ToString()).Uri);
+            HttpResponseMessage response = await client.DeleteAsync(new StringBuilder(manufacturerUrl).Append("/").Append(id).ToString());
             if (response.IsSuccessStatusCode)
                 return true;
             return false;
@@ -66,6 +67,15 @@ namespace Pharmacy.Data
             if (response.IsSuccessStatusCode)
                 return true;
             return false;
+        }
+
+        public IEnumerable<Manufacturer> Search(string query)
+        {
+            return Task.Run(async () => await GetAll()).Result.Where(i => 
+            i.Title.ToLower().Contains(query.ToLower()) 
+            || i.Phone.ToLower().Contains(query.ToLower()) 
+            || i.Address.ToLower().Contains(query.ToLower()) 
+            || i.Email.ToLower().Contains(query.ToLower()));
         }
 
         public async Task<bool> Update(Manufacturer obj)
