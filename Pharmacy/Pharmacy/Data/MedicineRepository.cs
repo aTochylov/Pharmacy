@@ -2,7 +2,9 @@
 using Pharmacy.Data.Abstract;
 using Pharmacy.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Resources;
 using System.Text;
@@ -64,6 +66,18 @@ namespace Pharmacy.Data
             if (response.IsSuccessStatusCode)
                 return true;
             return false;
+        }
+
+        public IEnumerable<Medicine> Search(string query)
+        {
+            var manufacturers = Task.Run(async () => await UnitOfWork.GetUnitOfWork().ManufacturerRepository.GetAll()).Result;
+            return Task.Run(async () => await GetAll()).Result
+                .Join(manufacturers, med => med.ManufacturerId, manuf => manuf.ManufacturerId, (med, manuf) => new { med, manuf.Title })
+                .Where(x =>
+                x.med.Title.ToLower().Contains(query.ToLower())
+            || x.med.Barcode.ToLower().Contains(query.ToLower())
+            || x.Title.ToLower().Contains(query.ToLower()
+            )).Select(x => x.med).OrderByDescending(x => x.Title).ThenByDescending(x => x.Barcode);
         }
 
         public async Task<bool> Update(Medicine obj)

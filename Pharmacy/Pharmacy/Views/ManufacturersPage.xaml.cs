@@ -1,10 +1,5 @@
 ﻿using Pharmacy.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -13,7 +8,11 @@ namespace Pharmacy.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ManufacturersPage : ContentPage
     {
+        private Task searchTask;
+        private short timeDelay = 1000;
+
         ManufacturersViewModel _viewModel;
+
         public ManufacturersPage()
         {
             InitializeComponent();
@@ -25,9 +24,17 @@ namespace Pharmacy.Views
             _viewModel.OnAppearing();
         }
 
-        public void SearchBar_TextChanged(object sender, TextChangedEventArgs e)
+        private void SearchBar_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _viewModel.OnSearchTextChanged(((SearchBar)sender).Text);
+            if (searchTask == null || searchTask.IsCompleted)
+            {
+                searchTask = Task.Run(async () =>
+                {
+                    await Task.Delay(timeDelay);
+                    _viewModel.OnSearchTextChanged(((SearchBar)sender).Text);
+                });
+            }
+
         }
     }
 }
