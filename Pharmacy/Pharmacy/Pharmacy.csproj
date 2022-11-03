@@ -6,15 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\MockDataStore.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="GettingStarted.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="sqlite-net-pcl" Version="1.4.118" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />  
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
   </ItemGroup>

@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Pharmacy.ViewModels
@@ -88,7 +89,6 @@ namespace Pharmacy.ViewModels
 
         public MedicineDetailViewModel()
         {
-
             SaveCommand = new Command(OnSave, ValidateSave);
             CancelCommand = new Command(OnCancel);
             this.PropertyChanged +=
@@ -100,7 +100,7 @@ namespace Pharmacy.ViewModels
         {
             return !String.IsNullOrWhiteSpace(title)
                 && !String.IsNullOrWhiteSpace(barcode)
-                && !App.MedicineRepo.GetItems().Any(m => (m.Id != MedicineId) && (m.Barcode == Barcode));
+                && !Task.Run(async() => await data.MedicineRepository.GetAll()).Result.Any(m => (m.MedicineId != MedicineId) && (m.Barcode == Barcode));
         }
 
         private async void OnCancel() => await Shell.Current.GoToAsync("..");
@@ -109,7 +109,7 @@ namespace Pharmacy.ViewModels
         {
             Medicine newMedicine = new Medicine()
             {
-                Id = MedicineId,
+                MedicineId = MedicineId,
                 Title = Title,
                 Barcode = Barcode,
                 ManufacturerId = manufacturerId,
@@ -120,13 +120,13 @@ namespace Pharmacy.ViewModels
                 ExpirationDate = ExpirationDate,
                 Quantity = Quantity
             };
-            App.MedicineRepo.Update(newMedicine);
+            await data.MedicineRepository.Update(newMedicine);
             await Shell.Current.GoToAsync("..");
         }
 
         private async void OnDelete()
         {
-            App.MedicineRepo.Delete(App.MedicineRepo.Get(MedicineId));
+            await data.MedicineRepository.Delete(MedicineId);
             await Shell.Current.GoToAsync("..");
         }
 
@@ -134,11 +134,10 @@ namespace Pharmacy.ViewModels
         {
             try
             {
-                var Medicine = App.MedicineRepo.Get(MedicineId);
-                var manuf = App.ManufacturerRepo.Get(Medicine.ManufacturerId);
+                var Medicine = await data.MedicineRepository.GetById(MedicineId);
                 Title = Medicine.Title;
                 Barcode = Medicine.Barcode;
-                Manufacturer = manuf.Title;
+                Manufacturer = Medicine.Manufacturer.Title;
                 manufacturerId = Medicine.ManufacturerId;
                 Packaging = Medicine.Packaging;
                 Price = Medicine.Price;

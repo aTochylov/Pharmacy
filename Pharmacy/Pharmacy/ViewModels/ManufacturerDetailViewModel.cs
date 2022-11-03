@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Pharmacy.ViewModels
@@ -65,13 +66,13 @@ namespace Pharmacy.ViewModels
 
         private bool ValidateSave()
         {
-            var items = App.ManufacturerRepo.GetItems();
+            var items = Task.Run(async () => await data.ManufacturerRepository.GetAll()).Result;
             return !String.IsNullOrWhiteSpace(title)
                 && !String.IsNullOrWhiteSpace(phone)
                 && !String.IsNullOrWhiteSpace(email)
-                && !items.Any(m => (m.Id != manufacturerId) && (m.Title == Title))
-                && !items.Any(m => (m.Id != manufacturerId) && (m.Phone == Phone))
-                && !items.Any(m => (m.Id != manufacturerId) && m.Email == email);
+                && !items.Any(m => (m.ManufacturerId != manufacturerId) && (m.Title == Title))
+                && !items.Any(m => (m.ManufacturerId != manufacturerId) && (m.Phone == Phone))
+                && !items.Any(m => (m.ManufacturerId != manufacturerId) && m.Email == email);
         }
 
         private async void OnCancel() => await Shell.Current.GoToAsync("..");
@@ -80,19 +81,19 @@ namespace Pharmacy.ViewModels
         {
             Manufacturer newManufacturer = new Manufacturer()
             {
-                Id = ManufacturerId,
+                ManufacturerId = ManufacturerId,
                 Title = Title,
                 Address = Address,
                 Phone = Phone,
                 Email = Email
             };
-            App.ManufacturerRepo.Update(newManufacturer);
+            await data.ManufacturerRepository.Update(newManufacturer);
             await Shell.Current.GoToAsync("..");
         }
 
         private async void OnDelete()
         {
-            App.ManufacturerRepo.Delete(App.ManufacturerRepo.Get(ManufacturerId));
+            await data.ManufacturerRepository.Delete(ManufacturerId);
             await Shell.Current.GoToAsync("..");
         }
 
@@ -100,7 +101,7 @@ namespace Pharmacy.ViewModels
         {
             try
             {
-                var Manufacturer = App.ManufacturerRepo.Get(ManufacturerId);
+                var Manufacturer = Task.Run(async () => await data.ManufacturerRepository.GetById(ManufacturerId)).Result;
                 Title = Manufacturer.Title;
                 Address = Manufacturer.Address;
                 Phone = Manufacturer.Phone;

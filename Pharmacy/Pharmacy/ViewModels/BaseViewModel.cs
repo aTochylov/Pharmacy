@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pharmacy.Data;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -7,8 +8,15 @@ namespace Pharmacy.ViewModels
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
+        public UnitOfWork data { get; set; }
+
+        public BaseViewModel()
+        {
+            data = UnitOfWork.GetUnitOfWork();
+        }
 
         bool isBusy = false;
+
         public bool IsBusy
         {
             get { return isBusy; }

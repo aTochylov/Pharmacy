@@ -1,6 +1,7 @@
 ﻿using Pharmacy.Models;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Pharmacy.ViewModels
@@ -22,7 +23,7 @@ namespace Pharmacy.ViewModels
 
         private bool ValidateSave()
         {
-            var items = App.ManufacturerRepo.GetItems();
+            var items = Task.Run(async () => await data.ManufacturerRepository.GetAll()).Result;
             return !String.IsNullOrWhiteSpace(title)
                 && !String.IsNullOrWhiteSpace(phone)
                 && !String.IsNullOrWhiteSpace(email)
@@ -67,7 +68,7 @@ namespace Pharmacy.ViewModels
                 Address = Address,
                 Email = Email
             };
-            App.ManufacturerRepo.Add(newManufacturer);
+            await data.ManufacturerRepository.Insert(newManufacturer);
             await Shell.Current.GoToAsync("..");
         }
     }

@@ -3,6 +3,7 @@ using Pharmacy.Views;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Pharmacy.ViewModels
@@ -36,7 +37,7 @@ namespace Pharmacy.ViewModels
             try
             {
                 Medicines.Clear();
-                var medicines = App.MedicineRepo.GetItems();
+                var medicines = Task.Run(async () => await data.MedicineRepository.GetAll()).Result;
                 foreach (var medicine in medicines)
                 {
                     Medicines.Add(medicine);
@@ -54,10 +55,10 @@ namespace Pharmacy.ViewModels
 
         public void OnSearchTextChanged(string query)
         {
-            Medicines.Clear();
-            var results = App.MedicineRepo.GetSearchResults(query);
-            foreach (var r in results)
-                Medicines.Add(r);
+            //Medicines.Clear();
+            //var results = App.MedicineRepo.GetSearchResults(query);
+            //foreach (var r in results)
+            //    Medicines.Add(r);
         }
 
         public void OnAppearing()
@@ -82,7 +83,7 @@ namespace Pharmacy.ViewModels
         {
             if (Medicine == null)
                 return;
-            await Shell.Current.GoToAsync($"{nameof(MedicineDetailPage)}?{nameof(MedicineDetailViewModel.MedicineId)}={Medicine.Id}");
+            await Shell.Current.GoToAsync($"{nameof(MedicineDetailPage)}?{nameof(MedicineDetailViewModel.MedicineId)}={Medicine.MedicineId}");
         }
     }
 }

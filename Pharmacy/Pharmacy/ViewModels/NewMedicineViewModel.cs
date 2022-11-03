@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Pharmacy.ViewModels
@@ -22,7 +23,7 @@ namespace Pharmacy.ViewModels
 
         public NewMedicineViewModel()
         {
-            Manufacturers = new ObservableCollection<Manufacturer>(App.ManufacturerRepo.GetItems());
+            Manufacturers = new ObservableCollection<Manufacturer>(Task.Run(async()=>await data.ManufacturerRepository.GetAll()).Result);
             DateOfManufacture = DateTime.Today;
             ExpirationDate = DateTime.Today;
             SaveCommand = new Command(OnSave, ValidateSave);
@@ -35,8 +36,8 @@ namespace Pharmacy.ViewModels
         {
             return !String.IsNullOrWhiteSpace(title)
                 && !String.IsNullOrWhiteSpace(barcode)
-                && selectedManufacturer != null
-                && !App.MedicineRepo.GetItems().Any(m => m.Barcode == Barcode);
+                //&& selectedManufacturer != null
+                && !Task.Run(async () => await data.MedicineRepository.GetAll()).Result.Any(m => m.Barcode == Barcode);
         }
 
         public string Title
@@ -108,7 +109,7 @@ namespace Pharmacy.ViewModels
             {
                 Title = Title,
                 Barcode = Barcode,
-                ManufacturerId = SelectedManufacturer.Id,
+                ManufacturerId = SelectedManufacturer.ManufacturerId,
                 Packaging = Packaging,
                 Price = Price,
                 OnPrescription = OnPrescription,
@@ -116,7 +117,7 @@ namespace Pharmacy.ViewModels
                 ExpirationDate = ExpirationDate,
                 Quantity = Quantity
             };
-            App.MedicineRepo.Add(newMedicine);
+            await data.MedicineRepository.Insert(newMedicine);
             await Shell.Current.GoToAsync("..");
         }
     }
