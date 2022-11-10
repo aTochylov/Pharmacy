@@ -120,13 +120,13 @@ namespace Pharmacy.ViewModels
                 ExpirationDate = ExpirationDate,
                 Quantity = Quantity
             };
-            await data.MedicineRepository.Update(newMedicine);
+            Device.BeginInvokeOnMainThread(() => DependencyService.Get<IMessage>().ShortAlert(Task.Run(async () => await data.MedicineRepository.Update(newMedicine)).Result));
             await Shell.Current.GoToAsync("..");
         }
 
         private async void OnDelete()
         {
-            await data.MedicineRepository.Delete(MedicineId);
+            Device.BeginInvokeOnMainThread(() => DependencyService.Get<IMessage>().ShortAlert(Task.Run(async () => await data.MedicineRepository.Delete(MedicineId)).Result));
             await Shell.Current.GoToAsync("..");
         }
 

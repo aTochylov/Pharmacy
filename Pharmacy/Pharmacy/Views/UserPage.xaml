@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Pharmacy.Views.UserPage">
+    <ContentPage.Content>
+        <StackLayout>
+            <Button Text="Delete" Command="{Binding DeleteCommand}"
+                    FontAttributes="Bold" FontSize="Large" HorizontalOptions="FillAndExpand"/>
+            <Button Text="Add user" Command="{Binding AddCommand}"
+                    FontAttributes="Bold" FontSize="Large" HorizontalOptions="FillAndExpand"/>
+                <Frame IsVisible="{Binding IsFrameVisible, Mode=TwoWay} ">
+                <StackLayout Orientation="Vertical" Spacing="10">
+                    <Entry x:Name="Username" Text="{Binding Username}" Placeholder="Login"   
+                           HeightRequest="40"   
+                           Keyboard="Email" />
+                    <Entry x:Name="Password" Text="{Binding Password}" Placeholder="Password"   
+                           HeightRequest="40"   
+                           IsPassword="True"/>
+                    <Label Text="Is Administrator:" IsVisible="{Binding IsAdminVisible, Mode=TwoWay}"/>
+                    <CheckBox IsChecked="{Binding IsAdmin, Mode=TwoWay}" IsVisible="{Binding IsAdminVisible, Mode=TwoWay}"/>
+                    <Button Text="{Binding CommandText, Mode=TwoWay}" Command="{Binding SubmitCommand}"
+                    FontAttributes="Bold" FontSize="Large" HorizontalOptions="FillAndExpand"/>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

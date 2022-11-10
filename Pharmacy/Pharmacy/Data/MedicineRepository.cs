@@ -2,13 +2,14 @@
 using Pharmacy.Data.Abstract;
 using Pharmacy.Models;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace Pharmacy.Data
 {
@@ -16,26 +17,26 @@ namespace Pharmacy.Data
     {
         private readonly string MedicineUrl;
         private readonly HttpClient client;
+        private object token;
 
         public MedicineRepository()
-        {
+        {                     
             ResourceManager rm = new ResourceManager("Pharmacy.AppResources", typeof(MedicineRepository).Assembly);
             string url = rm.GetString("ApiConnection");
             string controller = rm.GetString("MedicineController");
             MedicineUrl = url != null && controller != null ? new StringBuilder(url).Append("/").Append(controller).ToString()
                                 : throw new NullReferenceException($"Failed to create connection string: {url}");
             client = new HttpClient();
+            Application.Current.Properties.TryGetValue("token", out token);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.ToString());
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<string> Delete(int id)
         {
             HttpResponseMessage response = await client.DeleteAsync(new StringBuilder(MedicineUrl).Append("/").Append(id).ToString());
-            if (response.IsSuccessStatusCode)
-                return true;
-            return false;
+            return await response.Content.ReadAsStringAsync();
         }
-
-        public async Task<IEnumerable<Medicine>> GetAll()
+            public async Task<IEnumerable<Medicine>> GetAll()
         {
             HttpResponseMessage response = await client.GetAsync(MedicineUrl);
             if (response.IsSuccessStatusCode)
@@ -57,15 +58,13 @@ namespace Pharmacy.Data
             return null;
         }
 
-        public async Task<bool> Insert(Medicine obj)
+        public async Task<string> Insert(Medicine item)
         {
-            string json = JsonConvert.SerializeObject(obj);
+            string json = JsonConvert.SerializeObject(item);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await client.PostAsync(MedicineUrl, content);
-            if (response.IsSuccessStatusCode)
-                return true;
-            return false;
+            return await response.Content.ReadAsStringAsync();
         }
 
         public IEnumerable<Medicine> Search(string query)
@@ -80,15 +79,13 @@ namespace Pharmacy.Data
             )).Select(x => x.med).OrderByDescending(x => x.Title).ThenByDescending(x => x.Barcode);
         }
 
-        public async Task<bool> Update(Medicine obj)
+        public async Task<string> Update(Medicine item)
         {
-            string json = JsonConvert.SerializeObject(obj);
+            string json = JsonConvert.SerializeObject(item);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await client.PutAsync(new StringBuilder(MedicineUrl).Append("/").Append(obj.MedicineId).ToString(), content);
-            if (response.IsSuccessStatusCode)
-                return true;
-            return false;
+            var response = await client.PutAsync(new StringBuilder(MedicineUrl).Append("/").Append(item.MedicineId).ToString(), content);
+            return await response.Content.ReadAsStringAsync();
         }
     }
 }

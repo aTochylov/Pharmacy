@@ -87,13 +87,13 @@ namespace Pharmacy.ViewModels
                 Phone = Phone,
                 Email = Email
             };
-            await data.ManufacturerRepository.Update(newManufacturer);
+            Device.BeginInvokeOnMainThread(() => DependencyService.Get<IMessage>().ShortAlert(Task.Run(async () => await data.ManufacturerRepository.Update(newManufacturer)).Result));
             await Shell.Current.GoToAsync("..");
         }
 
         private async void OnDelete()
         {
-            await data.ManufacturerRepository.Delete(ManufacturerId);
+            Device.BeginInvokeOnMainThread(() => DependencyService.Get<IMessage>().ShortAlert(Task.Run(async () => await data.ManufacturerRepository.Delete(ManufacturerId)).Result));
             await Shell.Current.GoToAsync("..");
         }
 

@@ -126,4 +126,7 @@
   <data name="MedicineController" xml:space="preserve">
     <value>Medicines</value>
   </data>
+  <data name="UserController" xml:space="preserve">
+    <value>Auth</value>
+  </data>
 </root>

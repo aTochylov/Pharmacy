@@ -7,9 +7,8 @@ namespace Pharmacy.Data.Abstract
     {
         Task<IEnumerable<T>> GetAll();
         Task<T> GetById(int id);
-        Task<bool> Insert(T obj);
-        Task<bool> Update(T obj);
-        Task<bool> Delete(int id);
-        //IEnumerable<T> Search(string query);
+        Task<string> Insert(T item);
+        Task<string> Update(T item);
+        Task<string> Delete(int id);
     }
 }

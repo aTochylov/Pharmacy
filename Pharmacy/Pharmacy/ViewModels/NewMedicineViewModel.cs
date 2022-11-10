@@ -23,7 +23,7 @@ namespace Pharmacy.ViewModels
 
         public NewMedicineViewModel()
         {
-            Manufacturers = new ObservableCollection<Manufacturer>(Task.Run(async()=>await data.ManufacturerRepository.GetAll()).Result);
+            Manufacturers = new ObservableCollection<Manufacturer>(Task.Run(async () => await data.ManufacturerRepository.GetAll()).Result);
             DateOfManufacture = DateTime.Today;
             ExpirationDate = DateTime.Today;
             SaveCommand = new Command(OnSave, ValidateSave);
@@ -117,7 +117,7 @@ namespace Pharmacy.ViewModels
                 ExpirationDate = ExpirationDate,
                 Quantity = Quantity
             };
-            await data.MedicineRepository.Insert(newMedicine);
+            Device.BeginInvokeOnMainThread(() => DependencyService.Get<IMessage>().ShortAlert(Task.Run(async () => await data.MedicineRepository.Insert(newMedicine)).Result));
             await Shell.Current.GoToAsync("..");
         }
     }

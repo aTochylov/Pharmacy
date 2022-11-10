@@ -68,7 +68,7 @@ namespace Pharmacy.ViewModels
                 Address = Address,
                 Email = Email
             };
-            await data.ManufacturerRepository.Insert(newManufacturer);
+            Device.BeginInvokeOnMainThread(() => DependencyService.Get<IMessage>().ShortAlert(Task.Run(async () => await data.ManufacturerRepository.Insert(newManufacturer)).Result));
             await Shell.Current.GoToAsync("..");
         }
     }

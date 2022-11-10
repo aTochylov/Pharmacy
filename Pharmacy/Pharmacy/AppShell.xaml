@@ -56,11 +56,13 @@
             </Style>
         </ResourceDictionary>
     </Shell.Resources>
-
-    <FlyoutItem Title="Browse medicine" Icon="icon_feed.png">
-        <ShellContent Route="ItemsPage" ContentTemplate="{DataTemplate local:MedicinesPage}" />
+    <FlyoutItem x:Name="account" Title="Account" Icon="icon_feed.png">
+        <ShellContent Route="AccountPage" ContentTemplate="{DataTemplate local:UserPage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Browse manufacturers" Icon="icon_feed.png">
-        <ShellContent Route="ItemsPage" ContentTemplate="{DataTemplate local:ManufacturersPage}" />
+    <FlyoutItem x:Name="medicines" Title="Browse medicine" Icon="icon_feed.png">
+        <ShellContent Route="MedicinesPage" ContentTemplate="{DataTemplate local:MedicinesPage}" />
     </FlyoutItem>
- </Shell>
+    <FlyoutItem x:Name="manufacturers" Title="Browse manufacturers" Icon="icon_feed.png">
+        <ShellContent Route="ManufacturersPage" ContentTemplate="{DataTemplate local:ManufacturersPage}" />
+    </FlyoutItem>
+</Shell>
