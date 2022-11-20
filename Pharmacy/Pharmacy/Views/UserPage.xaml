@@ -1,27 +1,60 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
              x:Class="Pharmacy.Views.UserPage">
     <ContentPage.Content>
         <StackLayout>
-            <Button Text="Delete" Command="{Binding DeleteCommand}"
-                    FontAttributes="Bold" FontSize="Large" HorizontalOptions="FillAndExpand"/>
-            <Button Text="Add user" Command="{Binding AddCommand}"
-                    FontAttributes="Bold" FontSize="Large" HorizontalOptions="FillAndExpand"/>
-                <Frame IsVisible="{Binding IsFrameVisible, Mode=TwoWay} ">
-                <StackLayout Orientation="Vertical" Spacing="10">
-                    <Entry x:Name="Username" Text="{Binding Username}" Placeholder="Login"   
+            <xct:Expander >
+                <xct:Expander.Header>
+                    <Label Text="Delete" Margin="0,10,0,0" Padding="5" FontSize="Medium" BackgroundColor="{StaticResource Primary}" TextColor="White"></Label>
+                </xct:Expander.Header>
+                <StackLayout>
+                    <Entry x:Name="UsernameDelete" Text="{Binding Username}" Placeholder="Login"   
                            HeightRequest="40"   
                            Keyboard="Email" />
-                    <Entry x:Name="Password" Text="{Binding Password}" Placeholder="Password"   
+                    <Entry x:Name="PasswordDelete" Text="{Binding Password}" Placeholder="Password"   
                            HeightRequest="40"   
                            IsPassword="True"/>
-                    <Label Text="Is Administrator:" IsVisible="{Binding IsAdminVisible, Mode=TwoWay}"/>
-                    <CheckBox IsChecked="{Binding IsAdmin, Mode=TwoWay}" IsVisible="{Binding IsAdminVisible, Mode=TwoWay}"/>
-                    <Button Text="{Binding CommandText, Mode=TwoWay}" Command="{Binding SubmitCommand}"
+                    <Button Text="Delete" Command="{Binding DeleteCommand}"
                     FontAttributes="Bold" FontSize="Large" HorizontalOptions="FillAndExpand"/>
                 </StackLayout>
-            </Frame>
+            </xct:Expander>
+            <xct:Expander >
+                <xct:Expander.Header>
+                    <Label Text="Add user" Margin="0,10,0,0" Padding="5" FontSize="Medium" BackgroundColor="{StaticResource Primary}"  TextColor="White"></Label>
+                </xct:Expander.Header>
+                <StackLayout>
+                    <Entry x:Name="UsernameAdd" Text="{Binding Username}" Placeholder="Login"   
+                           HeightRequest="40"   
+                           Keyboard="Email" />
+                    <Entry x:Name="PasswordAdd" Text="{Binding Password}" Placeholder="Password"   
+                           HeightRequest="40"   
+                           IsPassword="True"/>
+                    <Label Text="Is Administrator:"/>
+                    <CheckBox IsChecked="{Binding IsAdmin, Mode=TwoWay}"/>
+                    <Button Text="Add user" Command="{Binding AddCommand}"
+                    FontAttributes="Bold" FontSize="Large" HorizontalOptions="FillAndExpand"/>
+                </StackLayout>
+            </xct:Expander>
+            <xct:Expander >
+                <xct:Expander.Header>
+                    <Label Text="Change password" Margin="0,10,0,0" Padding="5" FontSize="Medium" BackgroundColor="{StaticResource Primary}"  TextColor="White"></Label>
+                </xct:Expander.Header>
+                <StackLayout>
+                    <Entry x:Name="UsernameChange" Text="{Binding Username}" Placeholder="Login"   
+                           HeightRequest="40"   
+                           Keyboard="Email" />
+                    <Entry x:Name="PasswordChange" Text="{Binding Password}" Placeholder="Password"   
+                           HeightRequest="40"   
+                           IsPassword="True"/>
+                    <Entry x:Name="NewPassword" Text="{Binding NewPassword}" Placeholder="New password"   
+                           HeightRequest="40"   
+                           IsPassword="True"/>
+                    <Button Text="Change password" Command="{Binding ChangeCommand}"
+                    FontAttributes="Bold" FontSize="Large" HorizontalOptions="FillAndExpand"/>
+                </StackLayout>
+            </xct:Expander>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

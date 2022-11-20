@@ -1,6 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Pharmacy.Models;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Dynamic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Resources;
@@ -54,6 +57,20 @@ namespace Pharmacy.Data
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await client.PostAsync(new StringBuilder(UserUrl).Append("/").Append("Register").ToString(), content);
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> ChangePassword(UserDto userDto, string newPassword)
+        {
+            dynamic user = new ExpandoObject();
+            user.UserName = userDto.Username;
+            user.Password = userDto.Password;
+            user.NewPassword = newPassword;
+
+            string json = JsonConvert.SerializeObject(user);
+            StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync(new StringBuilder(UserUrl).Append("/").Append("password").ToString(), content);
             return await response.Content.ReadAsStringAsync();
         }
     }
